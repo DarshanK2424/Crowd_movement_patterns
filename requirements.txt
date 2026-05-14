@@ -1,0 +1,7 @@
+pandas
+numpy
+mlxtend
+networkx
+streamlit
+pyvis
+matplotlib
