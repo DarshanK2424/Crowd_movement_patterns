@@ -1,3 +1,8 @@
-1)First insall requirement.txt =pip install -r requirements.txt
-2)to run =  streamlit run dashboard.py
-    
+# Project Setup & Run Guide
+
+## 1. Install Requirements
+
+Open terminal in the project folder and run:
+
+```bash
+pip install -r requirements.txt
