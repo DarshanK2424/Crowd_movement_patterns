@@ -7,5 +7,4 @@ Open terminal in the project folder and run:
 ```bash
 pip install -r requirements.txt
 
-```bash
 streamlit run dashboard.py
