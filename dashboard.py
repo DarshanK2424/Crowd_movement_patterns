@@ -8,6 +8,7 @@ from data_generator import generate_campus_data
 from preprocessing import process_logs_to_transactions
 from pattern_mining import run_pattern_mining, load_transactions
 from graph_analysis import build_graph_from_transactions, analyze_graph
+from classification import prepare_classification_data, train_and_evaluate_models, predict_next_location
 import os
 
 st.set_page_config(page_title="Smart Campus Data Mining", layout="wide")
@@ -97,6 +98,46 @@ if os.path.exists("transactions.csv"):
     HtmlFile = open("campus_graph.html", 'r', encoding='utf-8')
     source_code = HtmlFile.read()
     components.html(source_code, height=520)
+
+    st.header("🤖 3. Next Location Prediction (Classification)")
+    st.markdown("Predict the **Next Location** a student will visit based on their current context using Supervised Learning.")
+    
+    with st.spinner("Preparing classification dataset..."):
+        X, y, le_loc, all_locs = prepare_classification_data()
+        
+    if X is not None:
+        with st.spinner("Training Naïve Bayes and KNN models..."):
+            models, accuracies = train_and_evaluate_models(X, y)
+            
+        col5, col6 = st.columns(2)
+        with col5:
+            st.subheader("Naïve Bayes (Bayes' Theorem)")
+            st.metric("Accuracy", f"{accuracies['Naive_Bayes']:.2%}")
+        with col6:
+            st.subheader("K-Nearest Neighbors (Lazy Learner)")
+            st.metric("Accuracy", f"{accuracies['KNN']:.2%}")
+            
+        st.subheader("Interactive Prediction")
+        st.markdown("Select a scenario to predict where the user will go next.")
+        
+        pred_col1, pred_col2, pred_col3 = st.columns(3)
+        with pred_col1:
+            sel_loc = st.selectbox("Current Location", all_locs)
+        with pred_col2:
+            sel_hour = st.slider("Hour of Day", 0, 23, 12)
+        with pred_col3:
+            days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+            sel_day_name = st.selectbox("Day of Week", days)
+            sel_day = days.index(sel_day_name)
+            
+        if st.button("Predict Next Location"):
+            nb_pred = predict_next_location(models['Naive_Bayes'], le_loc, sel_loc, sel_hour, sel_day)
+            knn_pred = predict_next_location(models['KNN'], le_loc, sel_loc, sel_hour, sel_day)
+            
+            st.success(f"**Naïve Bayes Predicts:** {nb_pred}")
+            st.success(f"**KNN Predicts:** {knn_pred}")
+    else:
+        st.warning("Could not train models. Ensure data is generated.")
 
 else:
     st.info("👈 Please click '1. Generate & Process Data' in the sidebar to begin.")

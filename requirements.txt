@@ -5,3 +5,4 @@ networkx
 streamlit
 pyvis
 matplotlib
+scikit-learn
